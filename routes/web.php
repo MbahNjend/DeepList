@@ -4,13 +4,16 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TodoController;
 
-// Redirect root to login page for guests, to todos.index for authenticated users
+// Redirect root to login page for guests
 Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('todos.index');
-    }
     return redirect()->route('login');
 });
+
+// Add a dashboard route that redirects to todos.index
+// This helps with Laravel's default auth redirects
+Route::get('/dashboard', function () {
+    return redirect()->route('todos.index');
+})->middleware(['auth'])->name('dashboard');
 
 // Protected routes that require authentication
 Route::middleware(['auth'])->group(function () {

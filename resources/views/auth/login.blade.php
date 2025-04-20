@@ -14,9 +14,9 @@
     <div class="w-full max-w-md">
         <!-- Logo and Title -->
         <div class="text-center mb-8">
-        <div class="flex justify-center">
-       <img class="flex " src="https://res.cloudinary.com/dwqblckdb/image/upload/v1745118222/scdomfyr1woiohwyhrrt.png" width="200px" alt="">
-       </div>
+            <div class="flex justify-center">
+                <img class="flex " src="https://res.cloudinary.com/dwqblckdb/image/upload/v1745118222/scdomfyr1woiohwyhrrt.png" width="200px" alt="">
+            </div>
             <p class="text-gray-500 mt-2">Sign in to manage your tasks</p>
         </div>
 

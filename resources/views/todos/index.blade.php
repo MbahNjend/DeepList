@@ -29,8 +29,21 @@
             class="fixed inset-y-0 left-0 z-40 w-64 bg-white transform lg:translate-x-0 lg:static lg:inset-0 transition duration-200 ease-in-out">
             <!-- Sidebar Content -->
             <div class="h-full flex flex-col overflow-hidden">
-                <div class="p-4">
-                    <h1 class="text-xl font-bold text-gray-800">✨ DeepList</h1>
+            <div class="flex justify-start p-5">
+                <img class="flex " src="https://res.cloudinary.com/dwqblckdb/image/upload/v1745118222/scdomfyr1woiohwyhrrt.png" width="150px" alt="">
+            </div>
+
+                <!-- User Profile Section in Sidebar -->
+                <div class="px-4 py-3 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-800 truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Navigation -->
@@ -130,26 +143,17 @@
                     </a>
                 </nav>
 
-                <!-- Priority Filter -->
+                <!-- Logout Button at Bottom of Sidebar -->
                 <div class="p-4 border-t border-gray-200">
-                    <h2 class="text-sm font-semibold text-gray-600 mb-3">PRIORITY</h2>
-                    <div class="space-y-2">
-                        <a href="{{ route('todos.index', ['priority' => 'high'] + request()->all()) }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors {{ request('priority') === 'high' ? 'bg-red-50' : 'hover:bg-gray-50' }}">
-                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                            <span class="text-gray-700">High Priority</span>
-                        </a>
-                        <a href="{{ route('todos.index', ['priority' => 'medium'] + request()->all()) }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors {{ request('priority') === 'medium' ? 'bg-amber-50' : 'hover:bg-gray-50' }}">
-                            <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                            <span class="text-gray-700">Medium Priority</span>
-                        </a>
-                        <a href="{{ route('todos.index', ['priority' => 'low'] + request()->all()) }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors {{ request('priority') === 'low' ? 'bg-emerald-50' : 'hover:bg-gray-50' }}">
-                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            <span class="text-gray-700">Low Priority</span>
-                        </a>
-                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 rounded-xl hover:bg-red-50 transition-all duration-200">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-100 text-red-600">
+                                <i class="ph-sign-out text-lg"></i>
+                            </div>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -160,9 +164,16 @@
             <header class="lg:hidden bg-white border-b border-gray-200 p-4">
                 <div class="flex items-center justify-between">
                     <h1 class="text-lg font-semibold text-gray-800">✨DeepList</h1>
-                    <button @click="sidebarOpen = true" class="text-gray-500">
-                        <i class="ph-list text-2xl"></i>
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('profile.edit') }}" class="text-gray-500">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
+                                {{ substr(auth()->user()->name, 0, 1) }}
+                            </div>
+                        </a>
+                        <button @click="sidebarOpen = true" class="text-gray-500">
+                            <i class="ph-list text-2xl"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -172,8 +183,7 @@
                     <div class="relative">
                         <form action="{{ route('todos.index') }}" method="GET" class="flex">
                             <div class="relative">
-                                <i
-                                    class="ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <i class="ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" name="search" placeholder="Search tasks..."
                                     value="{{ request('search') }}"
                                     class="pl-10 pr-4 py-2 w-64 bg-gray-50 border-none rounded-l-lg focus:ring-2 focus:ring-indigo-200">
@@ -186,11 +196,48 @@
                     </div>
                 </div>
 
-                <button onclick="showAddTaskModal()"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                    <i class="ph-plus"></i>
-                    Add Task
-                </button>
+                <div class="flex items-center gap-4">
+                    <button onclick="showAddTaskModal()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                        <i class="ph-plus"></i>
+                        Add Task
+                    </button>
+                
+                    <!-- User Profile Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" 
+                            class="flex items-center gap-2 focus:outline-none">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+                                {{ substr(auth()->user()->name, 0, 1) }}
+                            </div>
+                            <span class="text-gray-700 hidden md:inline">{{ auth()->user()->name }}</span>
+                            <i class="ph-caret-down text-gray-400"></i>
+                        </button>
+                
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 transform -translate-y-2"
+                            x-transition:enter-end="opacity-100 transform translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 transform translate-y-0"
+                            x-transition:leave-end="opacity-0 transform -translate-y-2"
+                            class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                            
+                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                <i class="ph-user-circle"></i>
+                                Profile Settings
+                            </a>
+                            
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="ph-sign-out"></i>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <!-- Main Content Area -->
