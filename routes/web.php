@@ -4,25 +4,29 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TodoController;
 
+// Redirect root to login page for guests, to todos.index for authenticated users
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('todos.index');
+    }
+    return redirect()->route('login');
 });
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
+// Protected routes that require authentication
+Route::middleware(['auth'])->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Todo routes - all protected by auth middleware
+    Route::get('/todos', [TodoController::class, 'index'])->name('todos.index');
+    Route::post('/todos', [TodoController::class, 'store'])->name('todos.store');
+    Route::put('/todos/{todo}', [TodoController::class, 'update'])->name('todos.update');
+    Route::delete('/todos/{todo}', [TodoController::class, 'destroy'])->name('todos.destroy');
+    Route::patch('/todos/{todo}/toggle', [TodoController::class, 'toggle'])->name('todos.toggle');
+    Route::get('/todos/{todo}/edit', [TodoController::class, 'edit'])->name('todos.edit');
 });
 
-Route::get('/', [TodoController::class, 'index'])->name('todos.index');
-Route::post('/todos', [TodoController::class, 'store'])->name('todos.store');
-Route::put('/todos/{todo}', [TodoController::class, 'update'])->name('todos.update');
-Route::delete('/todos/{todo}', [TodoController::class, 'destroy'])->name('todos.destroy');
-Route::patch('/todos/{todo}/toggle', [TodoController::class, 'toggle'])->name('todos.toggle');
-Route::get('/todos/{todo}/edit', [TodoController::class, 'edit'])->name('todos.edit');
-
+// Auth routes (login, register, etc.)
 require __DIR__ . '/auth.php';
